@@ -43,8 +43,14 @@ The other major module is *fatname.py*.  This is where all the conversion from h
 short file names occurs.  It's somewhat hard to be sure that all possible cases are accounted for (the available fat file
 system documentation leaves a bit too much as an exercise to the reader).   If there's a case that doesn't work, perhaps the
 best thing is to rename your static files; alternatively, suggest a patch.  
+
 The code also doesn't check for "long name" collisions -- cases where two
 long names are rewritten (to meet windows requirements) to the same string.  
 
 This was implemented using the gcc compiler; _fat.h_ uses attributes to define packed data structures for key components of the 
 fat16 file system.  This is an area of risk if you move to a different compiler.
+
+I did look at emfat (see below) but decided that I wanted to pursue a different direction.  In particular, fat16gen uses a python script to generate information that is similar to what emfat requires as input.  Another essential difference is that the fat16gen generates static directory "files".   This greatly simplified the necessary runtime and made it easier to support the rather complex issues related to long file names.
+
+link to fat documentation:  download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9.../fatgen103.doc 
+a related project for fat32: https://github.com/fetisov/emfat
