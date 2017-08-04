@@ -52,6 +52,7 @@ fat16 file system.  This is an area of risk if you move to a different compiler.
 
 I did look at emfat (see below) but decided that I wanted to pursue a different direction.  In particular, fat16gen uses a python script to generate information that is similar to what emfat requires as input.  Another essential difference is that the fat16gen generates static directory "files".   This greatly simplified the necessary runtime and made it easier to support the rather complex issues related to long file names.
 
-### link to fat documentation: http://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/fatgen103.doc
+## Links
 
-### a related project for fat32: https://github.com/fetisov/emfat
+* [link to fat documentation](http://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/fatgen103.doc)
+* [link to emfat](https://github.com/fetisov/emfat)
