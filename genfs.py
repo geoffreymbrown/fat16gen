@@ -293,8 +293,8 @@ class vFileSystem:
         # boot record
         DF("\t{0,0,512,datagen,&br},")                                 
         # fat tables (2)
-        DF("\t{1,0,%d,fatgen,0},"%(fat_sectors*512))                   
-        DF("\t{%d,0,%d,fatgen,0},"%(1+fat_sectors,fat_sectors*512))    
+        DF("\t{1,0,%d,fat16,0},"%(fat_sectors*512))                   
+        DF("\t{%d,0,%d,fat16,0},"%(1+fat_sectors,fat_sectors*512))    
         # root dirctory
         DF("\t{%d,0,%d,datagen,dir_0},"%(1+2*fat_sectors,rootdirlen))  
         

@@ -8,4 +8,4 @@ fs.c : genfs.py fatname.py testdir
 	python genfs.py > fs.c
 
 clean :
-	rm -r *.pyc fatgen test.img *.dSYM
+	rm -rf *.pyc fatgen test.img *.dSYM

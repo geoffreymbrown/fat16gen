@@ -95,7 +95,7 @@ struct vfile_s {
 };
 
 extern datagen_t datagen;
-extern datagen_t fatgen;
+extern datagen_t fat16;
 extern int read_vdisk(const void *instance, uint32_t startblk, uint8_t *buf, uint32_t n);
 
 #endif

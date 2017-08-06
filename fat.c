@@ -4,11 +4,6 @@
 #include <stdio.h>
 #include "fat.h"
 
-static uint8_t *write16(uint8_t *buf, uint16_t val) {
-  *buf++ = (val & 0xff);
-  *buf++ = (val  >> 8) & 0xff;
-  return buf;
-}
 
 int datagen(uint32_t blknum, uint8_t *buf, const vfile_t *filesys, uint32_t index) {
   const uint8_t *data = (const uint8_t *) filesys->table[index].data;
@@ -19,39 +14,56 @@ int datagen(uint32_t blknum, uint8_t *buf, const vfile_t *filesys, uint32_t inde
   return 0;
 }
 
-int fatgen(uint32_t blknum, uint8_t *buf, const vfile_t *filesys, uint32_t idx) {
+/*
+ * Separate code to compute fat entry for a given cluster from code that
+ * writes the fat table entry.  This should make it easier to support fat12 or fat32 if
+ * needed.
+ */
+
+// compute the correct fat entry
+// returns a value suitable for fat12,fat16, and fat32
+
+static inline uint32_t fatentry(const vfile_t *filesys, uint32_t cluster, uint32_t *index){
+
+  if (cluster == 0)
+    return 0x0FFFFFF8;
+
+  if (cluster == 1)
+    return 0x0FFFFFFF;
+
+  // Bad cluster ?
+
+  if (cluster >= filesys->maxcluster) 
+    return 0x0FFFFFF7;
+
+  // Find the correct table entry
+
+  if (cluster < filesys->table[*index].start_cluster)
+    *index = 0;
+
+  while (cluster >= filesys->table[*index+1].start_cluster) 
+    *index = *index + 1;
+  
+  // compute entry
+
+  int cmp = (filesys->table[*index].start_cluster +
+	     filesys->table[*index].len/(512*filesys->blocks_per_cluster)) - cluster;
+  if (cmp == 0)  // last cluster in file 
+    return 0x0FFFFFF8;
+  if (cmp > 0)   // not last
+    return cluster + 1;
+    return 0;    // after last -- mark as empty
+}
+
+int fat16(uint32_t blknum, uint8_t *buf, const vfile_t *filesys, uint32_t idx) {
   (void) idx;
   uint32_t cluster = blknum * 256;
   uint32_t lastcluster  = cluster + 256;
-
-  if (!cluster) {
-    buf = write16(buf, 0xFFF8);
-    buf = write16(buf, 0xFFFF);
-    cluster += 2;
-  }
-
-  int index = 4;
+  uint32_t index = 0;  // starting point of table search
   for (; cluster < lastcluster; cluster++) {
-
-    // end of file system
-
-    if (cluster >= filesys->maxcluster) {
-      buf = write16(buf, 0xFFF7);
-      continue;
-    }
-
-    // find correct entry in table
-
-    while (cluster >= filesys->table[index+1].start_cluster) index++;
-    
-    int cmp = (filesys->table[index].start_cluster +
-	       filesys->table[index].len/(512*filesys->blocks_per_cluster)) - cluster;
-    if (cmp == 0)  // last cluster
-      buf = write16(buf,0xFFFF);
-    if (cmp > 0)   // not last
-      buf = write16(buf,cluster+1);
-    if (cmp < 0)  // after last
-      buf = write16(buf,0);
+    uint32_t val = fatentry(filesys, cluster, &index);
+    *buf++ = (val & 0xff);
+    *buf++ = (val  >> 8) & 0xff;
   }
   return 0;
 }
