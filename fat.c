@@ -5,12 +5,13 @@
 #include "fat.h"
 
 
-int datagen(uint32_t blknum, uint8_t *buf, const vfile_t *filesys, uint32_t index) {
+int datagen(uint32_t blknum, uint8_t *buf, const vfile_t *filesys, 
+	    uint32_t index) {
   const uint8_t *data = (const uint8_t *) filesys->table[index].data;
   uint32_t len = filesys->table[index].len;
 
-  for (int i = 0; (i < 512) && (i  + blknum*512 < len); i++)
-    buf[i] = data[i+blknum*512];
+  for (int i = 0; (i < BLOCKSIZE) && (i  + blknum*BLOCKSIZE < len); i++)
+    buf[i] = data[i+blknum*BLOCKSIZE];
   return 0;
 }
 
@@ -47,7 +48,7 @@ static inline uint32_t fatentry(const vfile_t *filesys, uint32_t cluster, uint32
   // compute entry
 
   int cmp = (filesys->table[*index].start_cluster +
-	     filesys->table[*index].len/(512*filesys->blocks_per_cluster)) - cluster;
+	     filesys->table[*index].len/(BLOCKSIZE*filesys->blocks_per_cluster)) - cluster;
   if (cmp == 0)  // last cluster in file 
     return 0x0FFFFFF8;
   if (cmp > 0)   // not last
@@ -72,7 +73,7 @@ int read_vdisk(const void *instance, uint32_t startblk, uint8_t *buf, uint32_t n
   const vfile_t *ft = (vfile_t *) instance;
   int index = 0;
   while (n--) {
-    bzero(buf,512);
+    bzero(buf,BLOCKSIZE);
     while (ft->table[index + 1].start_block <= startblk) index++;
     if (startblk < UINT32_MAX) {
       if (ft->table[index].fun) {
@@ -80,7 +81,7 @@ int read_vdisk(const void *instance, uint32_t startblk, uint8_t *buf, uint32_t n
       }
       startblk++;
     }
-    buf += 512;
+    buf += BLOCKSIZE;
   }
   return 0;
 }

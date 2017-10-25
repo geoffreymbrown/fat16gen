@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define BLOCKSIZE 512
+
 #define CRTTIME(hour,min,sec) ((hour)<<11 | (min) << 5 | ((sec)/2))
 #define CRTDATE(year,mon,day) ((year)-1980)<<9 |(mon) << 5 | (day)
 

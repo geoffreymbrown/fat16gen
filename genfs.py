@@ -29,7 +29,7 @@ def boot_record(DF,sectors, fat_sectors, cluster_size, root_dir_size, vname):
     DF('static const bootrecord br = {')
     DF('\t.jump_code = {0xEB,0x3C,0x90},')
     DF('\t.oem_name = "MSDOS5.0",')
-    DF('\t.bytes_per_sector = 512,')
+    DF('\t.bytes_per_sector = BLOCKSIZE,')
     DF('\t.cluster_size = %d, '%(cluster_size))
     DF('\t.reserved_sectors = 1,')
     DF('\t.fat_copies = 2,')
@@ -217,7 +217,7 @@ class vFileSystem:
             elem['size'] = self.sz(elem,index)
             if index > 0:
                 elem['cluster'] = cluster
-                cluster = cluster + (elem['size'] + 512*sectors_per_cluster-1)//(512*sectors_per_cluster)
+                cluster = cluster + (elem['size'] +   512*sectors_per_cluster-1)//(512*sectors_per_cluster)
             else:
                 elem['cluster'] = 0
 
