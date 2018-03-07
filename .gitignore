@@ -57,3 +57,4 @@ fs.c
 test.img
 *~
 \#*
+*.pyc
